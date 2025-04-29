@@ -1,0 +1,33 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/debian
+{
+	"name": "Coq Dev Container",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "coqorg/coq:8.18-ocaml-4.14-flambda",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"maximedenes.vscoq"
+			]
+		}
+	},
+	"runArgs" : [
+		"-t"
+	],
+
+	"overrideCommand": false,
+	"onCreateCommand": "opam exec -- opam update && opam exec -- opam install -y vscoq-language-server"
+	
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}

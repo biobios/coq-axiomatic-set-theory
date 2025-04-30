@@ -109,6 +109,25 @@ Module ZF (core:CoreZF).
         rewrite <- H0.
         apply H.
     Defined.
+    
+    Theorem not_empty_memberOf : forall A, A <> EmptySet <-> exists a:memberOf A, a In A.
+    Proof.
+        intros.
+        split.
+        intros.
+        specialize (not_empty A).
+        intro.
+        apply not_empty in H.
+        destruct H.
+        apply memCons in H as a.
+        exists a.
+        apply nature_memberOf.
+        intros.
+        apply not_empty.
+        destruct H.
+        exists (memCast A x).
+        apply H.
+    Defined.
 
     Theorem include_eq : forall a b, a =| b /\ a |= b -> a = b.
     Proof.

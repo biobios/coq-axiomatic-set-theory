@@ -479,6 +479,16 @@ Module ZF (core:CoreZF).
         apply H.
     Defined.
         
+    Theorem o_pair_left_in : forall a b z, z In (a, b) -> a In z.
+    Proof.
+        intros.
+        apply Pairing in H.
+        destruct H.
+        rewrite H.
+        apply pair_in.
+        rewrite H.
+        apply pair_in.
+    Defined.
 
     Theorem nature_π1 : forall a b:setType, a = π1 ( a , b ).
     Proof.    

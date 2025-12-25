@@ -370,8 +370,10 @@ Module ZF (core:CoreZF).
         apply inverse_memCons.
     Defined.
 
-    Theorem o_pair_eq : forall a b c d, (a, b) = (c, d) -> a = c /\ b = d.
+    Theorem o_pair_eq : forall a b c d, (a, b) = (c, d) <-> a = c /\ b = d.
     Proof.
+        intros.
+        split.
         intros.
         specialize (pair_in <: c :> <: c , d :>).
         intros.
@@ -405,6 +407,10 @@ Module ZF (core:CoreZF).
         rewrite H2 in H.
         apply pair_eq in H.
         apply pair_eq in H.
+        apply H.
+        intros.
+        f_equal.
+        apply H.
         apply H.
     Defined.
         

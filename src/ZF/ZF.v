@@ -799,6 +799,157 @@ Module ZF (core:CoreZF).
 
     Notation "f ← x" := (substitution f x) (at level 50):bioSet_scope.
 
+    Lemma func_memberOf : forall (A B:setType) (f: A → B) (a: memberOf A) (b: memberOf B), (a, b) In f <-> (b = f ← a).
+    Proof.
+        intros.
+        split.
+        intros.
+        unfold substitution.
+        apply injective_memCast.
+        rewrite <- (inverse_memCons B (π2 (|_| <: m In f | (memCast A a = π1 m) :>)) (nature_substitution A B f a)).
+        transitivity (π2 (a, b)).
+        apply nature_π2.
+        f_equal.
+        transitivity (|_| <: (a, b) :>).
+        apply singleton_union.
+        f_equal.
+        apply Extensionality.
+        split.
+        intros.
+        apply SchemaOfSpecification.
+        apply singleton_eq in H0.
+        split.
+        rewrite <- H0.
+        apply H.
+        rewrite <- H0.
+        apply nature_π1.
+        intros.
+        apply SchemaOfSpecification in H0.
+        apply singleton_eq.
+        specialize (nature_memberOf (B ^ A) f).
+        intro.
+        apply SchemaOfSpecification in H1.
+        destruct H1.
+        specialize (H2 a).
+        destruct H2 as [b'].
+        transitivity (π1 z, π2 z).
+        apply o_pair_eq.
+        split.
+        apply H0.
+        transitivity (b').
+        symmetry.
+        destruct H2.
+        f_equal.
+        apply H3.
+        apply H.
+        apply PowerSet in H1.
+        destruct H0.
+        specialize (H1 z H0).
+        apply SchemaOfSpecification in H1.
+        destruct H1.
+        destruct H4 as [a'].
+        destruct H4 as [b''].
+        specialize (nature_memberOf (B ^ A) f).
+        intro.
+        apply SchemaOfSpecification in H5.
+        destruct H5.
+        destruct H4.
+        destruct H7.
+        specialize (H6 (memCons A a' H7)).
+        rewrite <- (inverse_memCons A a' H7) in H6.
+        transitivity (b'').
+        destruct H2.
+        apply (injective_memCons B b' b'' (nature_memberOf B b') H8).
+        rewrite <- (inverse_memCast B b' (nature_memberOf B b')).
+        apply H9.
+        assert (memCast A a = a').
+        transitivity (π1 z).
+        apply H3.
+        symmetry.
+        rewrite H4.
+        apply nature_π1.
+        rewrite H10.
+        rewrite <- (inverse_memCons B b'' H8).
+        rewrite <- H4.
+        apply H0.
+        rewrite H4.
+        apply nature_π2.
+        symmetry.
+        apply PowerSet in H1.
+        destruct H0.
+        specialize (H1 z H0).
+        rewrite (inverse_memCons (A * B) z H1).
+        apply nature_π.
+        intros.
+        specialize (nature_memberOf (B ^ A) f).
+        intro.
+        apply SchemaOfSpecification in H0.
+        destruct H0.
+        specialize (H1 a).
+        destruct H1 as [b'].
+        destruct H1.
+        assert (b' = f ← a).
+        unfold substitution.
+        apply injective_memCast.
+        rewrite <- (inverse_memCons B (π2 (|_| <: m In f | (memCast A a = π1 m) :>)) (nature_substitution A B f a)).
+        transitivity (π2 (a, b')).
+        apply nature_π2.
+        f_equal.
+        transitivity (|_| <: (a, b') :>).
+        apply singleton_union.
+        f_equal.
+        apply Extensionality.
+        split.
+        intros.
+        apply SchemaOfSpecification.
+        apply singleton_eq in H3.
+        split.
+        rewrite <- H3.
+        apply H1.
+        rewrite <- H3.
+        apply nature_π1.
+        intros.
+        apply SchemaOfSpecification in H3.
+        apply singleton_eq.
+        transitivity (π1 z, π2 z).
+        apply o_pair_eq.
+        split.
+        apply H3.
+        apply PowerSet in H0.
+        destruct H3.
+        specialize (H0 z H3).
+        apply SchemaOfSpecification in H0.
+        destruct H0.
+        destruct H5 as [a'].
+        destruct H5 as [b''].
+        destruct H5.
+        destruct H6.
+        rewrite H5.
+        rewrite <- (nature_π2 a' b'').
+        apply (injective_memCons B b' b'' (nature_memberOf B b') H7).
+        rewrite <- (inverse_memCast B b' (nature_memberOf B b')).
+        apply H2.
+        rewrite <- (inverse_memCons B b'' H7).
+        assert (memCast A a = a').
+        transitivity (π1 z).
+        apply H4.
+        symmetry.
+        rewrite H5.
+        apply nature_π1.
+        rewrite H8.
+        rewrite <- H5.
+        apply H3.
+        symmetry.
+        apply PowerSet in H0.
+        destruct H3.
+        specialize (H0 z H3).
+        rewrite (inverse_memCons (A * B) z H0).
+        apply nature_π.
+        rewrite H.
+        rewrite <- H3.
+        apply H1.
+    Defined.
+
     Lemma ex_func : forall (A B:setType), A <> EmptySet -> B <> EmptySet -> (B ^ A) <> EmptySet.
     Proof.
         intros.

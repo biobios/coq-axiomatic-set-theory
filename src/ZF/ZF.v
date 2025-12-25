@@ -449,39 +449,30 @@ Module ZF (core:CoreZF).
         intros.
         split.
         intros.
+        assert (a = c).
         specialize (pair_in <: c :> <: c , d :>).
         intros.
         destruct H0.
         unfold OrderedPair in H.
         rewrite <- H in H0.
         apply Pairing in H0.
-        rewrite <- H in H1.
-        apply Pairing in H1.
         destruct H0.
-        specialize (pair_in a a).
-        intro.
-        destruct H2.
-        rewrite <- H0 in H2.
-        apply singleton_eq in H2.
-        split.
+        apply singleton_eq.
+        rewrite <- H0.
+        apply singleton_eq.
+        reflexivity.
         symmetry.
-        apply H2.
-        rewrite H2 in H.
-        apply pair_eq in H.
-        apply pair_eq in H.
-        apply H.
-        specialize (pair_in a b).
-        intro.
-        destruct H2.
-        rewrite <- H0 in H2.
-        apply singleton_eq in H2.
+        apply singleton_eq.
+        rewrite H0.
+        apply pair_in.
         split.
-        symmetry.
-        apply H2.
-        rewrite H2 in H.
-        apply pair_eq in H.
-        apply pair_eq in H.
-        apply H.
+        apply H0.
+        apply pair_eq with a.
+        apply pair_eq with <: a :>.
+        unfold OrderedPair in H.
+        rewrite H.
+        rewrite H0.
+        reflexivity.
         intros.
         f_equal.
         apply H.

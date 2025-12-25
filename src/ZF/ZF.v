@@ -189,6 +189,33 @@ Module ZF (core:CoreZF).
         apply H0.
     Defined.
 
+    Theorem empty_power : Pow EmptySet = <: EmptySet :>.
+    Proof.
+        apply Extensionality.
+        split.
+        intros.
+        apply PowerSet in H.
+        apply Pairing.
+        apply P_or_P.
+        apply Extensionality.
+        split.
+        intros.
+        apply H.
+        apply H0.
+        intros.
+        exfalso.
+        apply Empty with z0.
+        apply H0.
+        intros.
+        apply Pairing in H.
+        apply PowerSet.
+        unfold set_include.
+        intros.
+        apply (P_or_P (z = EmptySet)) in H.
+        rewrite <- H.
+        apply H0.
+    Defined.
+    
     Theorem include_reflexivity : forall a, a |= a.
     Proof.
         intros.

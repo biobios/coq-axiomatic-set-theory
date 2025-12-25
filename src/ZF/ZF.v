@@ -159,6 +159,23 @@ Module ZF (core:CoreZF).
         apply H.
     Defined.
 
+    Theorem empty_intersection : |‾| EmptySet = EmptySet.
+    Proof.
+        apply Extensionality.
+        split.
+        intros.
+        apply nature_intersection in H.
+        destruct H.
+        destruct H.
+        exfalso.
+        apply Empty with x.
+        apply H.
+        intros.
+        exfalso.
+        apply Empty with z.
+        apply H.
+    Defined.
+
     Theorem include_eq : forall a b, a =| b /\ a |= b -> a = b.
     Proof.
         intros.

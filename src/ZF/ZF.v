@@ -663,6 +663,23 @@ Module ZF (core:CoreZF).
         apply nature_memberOf.
     Defined.
         
+    Theorem nature_π : forall (A B:setType) (p:memberOf (A * B)), memCast (A * B) p = (π1 p, π2 p).
+    Proof.
+        intros.
+        specialize (nature_memberOf (A * B) p).
+        intro.
+        apply SchemaOfSpecification in H.
+        destruct H.
+        destruct H0 as [a].
+        destruct H0 as [b].
+        destruct H0.
+        rewrite H0.
+        apply o_pair_eq.
+        split.
+        apply nature_π1.
+        apply nature_π2.
+    Defined.
+        
     Definition dom (f:setType) := <: a In (|_| (|_| f)) | (exists p:memberOf f, a = π1 p) :>.
     Definition ran (f:setType) := <: o In (|_| (|_| f)) | (exists p:memberOf f, o = π2 p) :>.
 

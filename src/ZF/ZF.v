@@ -129,6 +129,20 @@ Module ZF (core:CoreZF).
         apply H.
     Defined.
 
+    Theorem empty_spec : forall (P:setType->Prop), <: x In EmptySet | P x :> = EmptySet.
+    Proof.
+        intros.
+        apply Extensionality.
+        split.
+        intros.
+        apply SchemaOfSpecification in H.
+        apply H.
+        intros.
+        exfalso.
+        apply (Empty z).
+        apply H.
+    Defined.
+
     Theorem include_eq : forall a b, a =| b /\ a |= b -> a = b.
     Proof.
         intros.

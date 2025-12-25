@@ -143,6 +143,22 @@ Module ZF (core:CoreZF).
         apply H.
     Defined.
 
+    Theorem empty_union : |_| EmptySet = EmptySet.
+    Proof.
+        apply Extensionality.
+        split.
+        intros.
+        apply UnionSet in H.
+        exfalso.
+        destruct H.
+        apply Empty with x.
+        apply H.
+        intros.
+        exfalso.
+        apply Empty with z.
+        apply H.
+    Defined.
+
     Theorem include_eq : forall a b, a =| b /\ a |= b -> a = b.
     Proof.
         intros.

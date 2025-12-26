@@ -444,6 +444,16 @@ Module ZF (core:CoreZF).
         apply inverse_memCons.
     Defined.
 
+    Theorem RelPowSpec : forall (A: setType) (R: setType -> Prop), <: x In A | R x :> In Pow A.
+    Proof.
+        intros.
+        apply PowerSet.
+        intro.
+        intro.
+        apply SchemaOfSpecification in H.
+        apply H.
+    Defined.
+
     Theorem o_pair_eq : forall a b c d, (a, b) = (c, d) <-> a = c /\ b = d.
     Proof.
         intros.
@@ -987,15 +997,6 @@ Module ZF (core:CoreZF).
         apply (memCons (B ^ A) (|_| <: f In (B ^ A) | (exists Pf, P (memCons (B ^ A) f Pf)) :>) H).
     Defined.
 
-    Theorem RelPowSpec : forall (A: setType) (R: setType -> Prop), <: x In A | R x :> In Pow A.
-    Proof.
-        intros.
-        apply PowerSet.
-        intro.
-        intro.
-        apply SchemaOfSpecification in H.
-        apply H.
-    Defined.
 
     Goal forall (A B:setType) (P:memberOf A->memberOf B->Prop), (forall a, exists! b, P a b) -> (exists! f:A → B, (forall a, P a (f←a))).
         intros.

@@ -963,86 +963,107 @@ Module ZF (core:CoreZF).
         apply H3.
     Defined.
 
-    Definition DefFunc {A B:setType} (Pa:A <> EmptySet) (Pb:B <> EmptySet) (P:A → B -> Prop) (Pe:exists f, P f /\ forall f', P f' -> f = f') : A → B.
+    Definition DefFunc {A B:setType} (P:memberOf A -> memberOf B -> Prop) (Pe:forall a:memberOf A, exists! b:memberOf B, P a b) : A → B.
     Proof.
-        assert (|_| <: f In (B ^ A) | (exists Pf, P (memCons (B ^ A) f Pf)) :> In (B ^ A)).
-        destruct Pe.
-        assert (memCast (B ^ A) x = |_| <: f In (B ^ A) | (exists Pf, P (memCons (B ^ A) f Pf)) :> ).
-        rewrite (singleton_union x).
-        f_equal.
-        apply Extensionality.
-        split.
-        intros.
-        apply SchemaOfSpecification.
-        apply singleton_eq in H0.
-        rewrite <- H0.
-        split.
-        apply nature_memberOf.
-        exists (nature_memberOf (B ^ A) x).
-        rewrite <- (inverse_memCast (B^A) x (nature_memberOf (B ^ A) x)).
-        apply H.
-        intros.
-        apply SchemaOfSpecification in H0.
-        destruct H0.
-        destruct H1.
-        apply singleton_eq.
-        apply H in H1.
-        transitivity (memCons (B^A) z x0).
-        f_equal.
-        apply H1.
-        symmetry.
-        apply inverse_memCons.
-        rewrite <- H0.
-        apply nature_memberOf.
-        apply (memCons (B ^ A) (|_| <: f In (B ^ A) | (exists Pf, P (memCons (B ^ A) f Pf)) :>) H).
-    Defined.
-
-
-    Goal forall (A B:setType) (P:memberOf A->memberOf B->Prop), (forall a, exists! b, P a b) -> (exists! f:A → B, (forall a, P a (f←a))).
-        intros.
         assert (<: z In (A * B) | (exists (a:memberOf A) (b:memberOf B), (a,b) = z /\ P a b) :> In (B ^ A)).
         apply SchemaOfSpecification.
         split.
-        apply (RelPowSpec (A * B) (fun z => exists (a:memberOf A) (b:memberOf B), (a,b) = z /\ P a b)).
-        intro.
-        specialize (H x).
-        destruct H.
-        exists x0.
+        apply (RelPowSpec).
+        intro a.
+        specialize (Pe a).
+        destruct Pe as [b].
+        exists b.
         split.
         apply SchemaOfSpecification.
         split.
         apply directProduct_in.
-        exists x.
-        exists x0.
+        exists a.
+        exists b.
         split.
-        f_equal.
-        destruct H.
+        reflexivity.
         apply H.
+        intro b'.
         intros.
         apply SchemaOfSpecification in H0.
         destruct H0.
-        destruct H1.
-        destruct H1.
+        destruct H1 as [a'].
+        destruct H1 as [b''].
         destruct H1.
         apply o_pair_eq in H1.
         destruct H1.
-        destruct H.
-        apply H4.
+        apply H.
         apply injective_memCast in H1.
         apply injective_memCast in H3.
         rewrite <- H1.
         rewrite <- H3.
         apply H2.
-        exists (memCons (B ^ A) <: z In (A * B) | (exists (a:memberOf A) (b:memberOf B), (a,b) = z /\ P a b) :> H0).
+        apply (memCons (B ^ A) <: z In (A * B) | (exists (a:memberOf A) (b:memberOf B), (a,b) = z /\ P a b) :> H).
+    Defined.
+
+    (* 関数の性質 P a b <-> b = DefFunc P H' ← a *)
+    Theorem func_eq : forall (A B:setType) (P:memberOf A->memberOf B->Prop) (Pe:forall a:memberOf A, exists! b:memberOf B, P a b) (a:memberOf A) (b:memberOf B), P a b <-> b = DefFunc P Pe ← a.
+    Proof.
+        intros.
         split.
         intros.
-        unfold substitution.
+        generalize Pe as Pe'.
+        specialize (Pe a).
+        intros.
+        destruct Pe as [b'].
+        destruct H0.
+        apply H1 in H.
+        rewrite <- H.
+        apply func_memberOf.
+        unfold DefFunc.
+        rewrite <- (inverse_memCons).
+        apply SchemaOfSpecification.
+        split.
+        apply directProduct_in.
+        exists a.
+        exists b'.
+        split.
+        reflexivity.
+        apply H0.
+        intros.
+        apply func_memberOf in H.
+        unfold DefFunc in H.
+        rewrite <- (inverse_memCons) in H.
+        apply SchemaOfSpecification in H.
+        destruct H.
+        destruct H0 as [a'].
+        destruct H0 as [b'].
+        destruct H0.
+        apply o_pair_eq in H0.
+        destruct H0.
+        apply injective_memCast in H0.
+        apply injective_memCast in H2.
+        rewrite <- H0.
+        rewrite <- H2.
+        apply H1.
+    Defined.
+
+    (* 関数の存在性と一意性 *)
+    Goal forall (A B:setType) (P:memberOf A->memberOf B->Prop), (forall a, exists! b, P a b) -> (exists! f:A → B, (forall a, P a (f←a))).
+        intros.
+        generalize H as H'.
+        intros.
+        specialize (nature_memberOf (B ^ A) (DefFunc P H')).
+        intros.
+        exists (DefFunc P H').
+        split.
+        intros.
+        intros.
         specialize (H a).
         destruct H as [b].
         destruct H.
-        assert (b = (memCons B (π2 (|_| <: m In memCons (B ^ A) <: z In A * B | (exists (a0:memberOf A) (b0 : memberOf B), (a0, b0) = z /\ P a0 b0) :> H0 | (memCast A a = π1 m) :>)) (nature_substitution A B (memCons (B ^ A) <: z In A * B | (exists (a0:memberOf A) (b0 : memberOf B), (a0, b0) = z /\ P a0 b0) :> H0) a))).
+        (*
+        apply (func_eq A B P H').
+        reflexivity.
+        *)
+        assert (b = DefFunc P H' ← a).
         apply injective_memCast.
-        rewrite <- (inverse_memCons B (π2 (|_| <: m In memCons (B ^ A) <: z In A * B | (exists (a0:memberOf A) (b0 : memberOf B), (a0, b0) = z /\ P a0 b0) :> H0 | (memCast A a = π1 m) :>)) (nature_substitution A B (memCons (B ^ A) <: z In A * B | (exists (a0:memberOf A) (b0 : memberOf B), (a0, b0) = z /\ P a0 b0) :> H0) a)).
+        unfold substitution.
+        rewrite <- (inverse_memCons).
         transitivity (π2 (a,b)).
         apply nature_π2.
         f_equal.
@@ -1056,7 +1077,8 @@ Module ZF (core:CoreZF).
         apply singleton_eq in H2.
         apply SchemaOfSpecification.
         split.
-        rewrite <- (inverse_memCons (B ^ A) <: z0 In A * B | (exists (a0 : memberOf A) (b0 : memberOf B), (a0, b0) = z0 /\ P a0 b0) :> H0).
+        unfold DefFunc.
+        rewrite <- (inverse_memCons).
         apply SchemaOfSpecification.
         split.
         rewrite <- H2.
@@ -1064,15 +1086,15 @@ Module ZF (core:CoreZF).
         exists a.
         exists b.
         split.
-        rewrite <- H2.
-        reflexivity.
+        apply H2.
         apply H.
         rewrite <- H2.
         apply nature_π1.
         intros.
         apply SchemaOfSpecification in H2.
         destruct H2.
-        rewrite <- (inverse_memCons (B ^ A) <: z In A * B | (exists (a0 : memberOf A) (b0 : memberOf B), (a0, b0) = z /\ P a0 b0) :> H0) in H2.
+        unfold DefFunc in H2.
+        rewrite <- (inverse_memCons) in H2.
         apply SchemaOfSpecification in H2.
         destruct H2.
         destruct H4 as [a'].
@@ -1096,6 +1118,7 @@ Module ZF (core:CoreZF).
         rewrite <- H2.
         apply H.
         intros.
+        unfold DefFunc.
         apply injective_memCast.
         rewrite <- (inverse_memCons).
         apply Extensionality.

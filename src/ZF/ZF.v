@@ -71,63 +71,9 @@ End Util_Notations_ZF.
 
 Module ZF (core:CoreZF).
     Include core.
-    Include AST.common.clasical.
     Include Util_Notations_ZF core.
 
     Definition Infinite (x:setType) := EmptySet In x/\ forall y, y In x -> y \_/ <: y :> In x.
-
-    Theorem not_empty : forall A, A <> EmptySet <-> exists a, a In A.
-    Proof.
-        intros.
-        split.
-        intros.
-        specialize (Law_of_excluded_middle (exists a, a In A)).
-        intros.
-        destruct H0.
-        apply H0.
-        assert (forall a, a In A -> False).
-        intros.
-        apply H0.
-        exists a.
-        apply H1.
-        exfalso.
-        apply H.
-        apply Extensionality.
-        split.
-        intros.
-        exfalso.
-        apply H1 with z.
-        apply H2.
-        intros.
-        exfalso.
-        apply Empty with z.
-        apply H2.
-        intros.
-        intro.
-        destruct H.
-        apply Empty with x.
-        rewrite <- H0.
-        apply H.
-    Defined.
-    
-    Theorem not_empty_memberOf : forall A, A <> EmptySet <-> exists a:memberOf A, a In A.
-    Proof.
-        intros.
-        split.
-        intros.
-        specialize (not_empty A).
-        intro.
-        apply not_empty in H.
-        destruct H.
-        apply memCons in H as a.
-        exists a.
-        apply nature_memberOf.
-        intros.
-        apply not_empty.
-        destruct H.
-        exists (memCast A x).
-        apply H.
-    Defined.
 
     Theorem empty_spec : forall (P:setType->Prop), <: x In EmptySet | P x :> = EmptySet.
     Proof.
@@ -272,23 +218,6 @@ Module ZF (core:CoreZF).
         apply H0.
     Defined.
 
-    Theorem include_intersection : forall a b, b <> EmptySet /\ a =| b -> |‾| a |= |‾| b.
-    Proof.
-        intros.
-        intro.
-        intros.
-        apply nature_intersection.
-        split.
-        destruct H.
-        apply not_empty in H.
-        apply H.
-        apply nature_intersection in H0.
-        intros.
-        apply H0.
-        apply H.
-        apply H1.
-    Defined.
-
     Theorem intersection_include : forall a b, a =| (a /‾\ b).
     Proof.
         intros.
@@ -304,7 +233,7 @@ Module ZF (core:CoreZF).
     Definition OrderedPair (a b:setType) := <: <: a :> , <: a, b :> :>.
     Notation "'(' a ',' b ')'" := (OrderedPair a b).
     Definition π1 (p:setType) := |_| (|‾| p).
-    Definition π2 (p:setType) := |_| <: y In (|_| p) | (|‾| p = |_| p) \/ (y = π1 p -> False) :>.
+    Definition π2 (p:setType) := |_| <: y In (|_| p) | ((|‾| p <> |_| p -> y <> π1 p) /\ (y = π1 p -> |‾| p = |_| p)) :>.
 
     Theorem pair_symmetry : forall a b, <: a, b :> = <: b, a :>.
     Proof.
@@ -561,8 +490,7 @@ Module ZF (core:CoreZF).
         intros.
         unfold π2.
         transitivity ( |_| <: b :>).
-        rewrite <- singleton_union with b.
-        reflexivity.
+        apply singleton_union.
         f_equal.
         rewrite <- o_pair_union with a b.
         rewrite <- o_pair_intersection with a b.
@@ -575,33 +503,35 @@ Module ZF (core:CoreZF).
         apply singleton_eq in H.
         rewrite <- H.
         apply pair_in.
-        specialize (Law_of_excluded_middle (a = b)).
-        intros.
-        destruct H0.
-        left.
-        rewrite H0.
-        reflexivity.
-        right.
+        split.
+        intro.
         intro.
         apply H0.
         apply singleton_eq in H.
         rewrite H.
+        rewrite H1.
+        reflexivity.
+        intro.
+        f_equal.
+        apply singleton_eq in H.
+        rewrite H.
         symmetry.
-        apply H1.
+        apply H0.
         intros.
         apply SchemaOfSpecification in H.
         destruct H.
         destruct H0.
-        apply pair_eq in H0.
-        rewrite H0 in H.
-        apply H.
         apply Pairing in H.
         destruct H.
-        exfalso.
-        apply H0.
+        specialize (H1 H).
+        apply pair_eq in H1.
+        rewrite <- H1.
+        apply singleton_eq.
+        symmetry.
         apply H.
-        rewrite H.
-        apply pair_in.
+        apply singleton_eq.
+        symmetry.
+        apply H.
     Defined.
 
     Theorem case_o_pair : forall a b z c:setType, z In (a, b) -> c In z -> (c = a \/ c = b).
@@ -883,84 +813,6 @@ Module ZF (core:CoreZF).
         rewrite H.
         rewrite <- H3.
         apply H1.
-    Defined.
-
-    Lemma ex_func : forall (A B:setType), A <> EmptySet -> B <> EmptySet -> (B ^ A) <> EmptySet.
-    Proof.
-        intros.
-        intro.
-        apply not_empty in H.
-        apply not_empty in H0.
-        destruct H as [a].
-        destruct H0 as [b].
-        apply (Empty (<: p In (A * B) | (exists a', (a',b) = p) :>)).
-        rewrite <- H1.
-        apply SchemaOfSpecification.
-        split.
-        apply PowerSet.
-        intro.
-        intro.
-        apply SchemaOfSpecification in H2.
-        apply H2.
-        intros.
-        exists (memCons B b H0).
-        split.
-        apply SchemaOfSpecification.
-        split.
-        apply SchemaOfSpecification.
-        split.
-        apply PowerSet.
-        intro.
-        intro.
-        apply PowerSet.
-        intro.
-        intro.
-        apply Pairing in H2.
-        apply UnionSet.
-        destruct H2.
-        rewrite H2 in H3.
-        apply singleton_eq in H3.
-        rewrite <- H3.
-        exists A.
-        split.
-        apply pair_in.
-        apply nature_memberOf.
-        rewrite H2 in H3.
-        apply Pairing in H3.
-        destruct H3.
-        rewrite H3.
-        exists A.
-        split.
-        apply pair_in.
-        apply nature_memberOf.
-        exists B.
-        split.
-        apply pair_in.
-        rewrite H3.
-        rewrite <- (inverse_memCons B b H0).
-        apply H0.
-        exists x.
-        exists b.
-        split.
-        f_equal.
-        symmetry.
-        apply inverse_memCons.
-        split.
-        apply nature_memberOf.
-        apply H0.
-        exists x.
-        f_equal.
-        apply inverse_memCons.
-        intros.
-        apply SchemaOfSpecification in H2.
-        destruct H2.
-        destruct H3.
-        apply o_pair_eq in H3.
-        rewrite (inverse_memCast B y' (nature_memberOf B y')).
-        apply (injective_memCast).
-        rewrite <- (inverse_memCons B b H0).
-        rewrite <- (inverse_memCons B y' (nature_memberOf B y')).
-        apply H3.
     Defined.
 
     Definition DefFunc {A B:setType} (P:memberOf A -> memberOf B -> Prop) (Pe:forall a:memberOf A, exists! b:memberOf B, P a b) : A → B.

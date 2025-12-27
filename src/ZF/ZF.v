@@ -239,6 +239,26 @@ Module ZF (core:CoreZF).
         apply H0.
     Defined.
 
+    Theorem include_intersection : forall a b, b <> EmptySet -> a =| b -> |‾| a |= |‾| b.
+    Proof.
+        intros.
+        intro.
+        intro.
+        apply nature_intersection in H1.
+        destruct H1.
+        destruct H1.
+        apply nature_intersection.
+        split.
+        - (* bが空集合でないことの証明 *)
+            apply not_empty.
+            apply H.
+        - (* bの任意の元がzを含むことの証明 *)
+            intros.
+            apply H2.
+            apply H0.
+            apply H3.
+    Defined.
+
     Theorem intersection_include : forall a b, a =| (a /‾\ b).
     Proof.
         intros.

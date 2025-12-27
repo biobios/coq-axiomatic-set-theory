@@ -75,6 +75,27 @@ Module ZF (core:CoreZF).
 
     Definition Infinite (x:setType) := EmptySet In x/\ forall y, y In x -> y \_/ <: y :> In x.
 
+    Theorem not_empty : forall a:setType, a <> EmptySet <-> exists y:setType, y In a.
+    Proof.
+        intros.
+        split.
+        - (* 右方向の証明 *)
+            intros.
+            specialize (Regularity a H).
+            intros.
+            destruct H0.
+            exists x.
+            apply H0.
+        - (* 左方向の証明 *)
+            intros.
+            unfold not.
+            intros.
+            rewrite H0 in H.
+            destruct H.
+            apply (Empty x).
+            apply H.
+    Defined.
+
     Theorem empty_spec : forall (P:setType->Prop), <: x In EmptySet | P x :> = EmptySet.
     Proof.
         intros.

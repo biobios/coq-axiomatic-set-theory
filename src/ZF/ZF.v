@@ -74,7 +74,7 @@ Module ZF (core:CoreZF).
     Include Util_Notations_ZF core.
 
     Definition Infinite (x:setType) := EmptySet In x/\ forall y, y In x -> y \_/ <: y :> In x.
-
+    
     Theorem not_empty : forall a:setType, a <> EmptySet <-> exists y:setType, y In a.
     Proof.
         intros.
@@ -642,6 +642,34 @@ Module ZF (core:CoreZF).
         split.
         apply nature_π1.
         apply nature_π2.
+    Defined.
+
+    Theorem not_self_in : forall A:setType, ~(A In A).
+    Proof.
+        intros.
+        intro.
+        specialize (Regularity <: A :>).
+        intros.
+        destruct H0.
+        apply not_empty.
+        exists A.
+        apply pair_in.
+        destruct H0.
+        apply Empty with A.
+        rewrite <- H1.
+        apply singleton_eq in H0.
+        apply nature_intersection.
+        split.
+        exists <: A :>.
+        apply pair_in.
+        intros.
+        rewrite <- H0 in H2.
+        apply Pairing in H2.
+        destruct H2.
+        rewrite H2.
+        apply pair_in.
+        rewrite H2.
+        apply H.
     Defined.
         
     Definition dom (f:setType) := <: a In (|_| (|_| f)) | (exists p:memberOf f, a = π1 p) :>.
